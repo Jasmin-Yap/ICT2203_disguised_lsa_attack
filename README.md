@@ -10,4 +10,4 @@ This attack uses python and scapy to copy the original packet and create fake pa
 The mitigation to this attack is to use OSPF MD5 Authentication, however this is only effective if the attacker does not know the secret key used to encrypt the data.
 
 This code is executed via CLI via the command:
-<filename>.py -v <ip of the victim router> -n <ip of the neighbor router> -i <interface that is used to sniff and send packets>
+"filename".py -v "ip of the victim router" -n "ip of the neighbor router" -i "interface that is used to sniff and send packets"
